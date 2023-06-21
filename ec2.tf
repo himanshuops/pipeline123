@@ -1,35 +1,23 @@
-pipeline {
-  agent any
-
-  environment {
-    AWS_ACCESS_KEY_ID = 'AKIAYRAZFAL7NBHPRHYP'
-    AWS_SECRET_ACCESS_KEY = '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'
-    AWS_DEFAULT_REGION = 'us-east-1'
-  }
-
-  stages {
-    stage('git') {
-      steps {
-        git 'https://github.com/himanshuops/pipeline123.git'
-      }
-    }
-
-    stage('Terraform Init') {
-      steps {
-        sh 'terraform init'
-      }
-    }
-
-    stage('Terraform Plan') {
-      steps {
-        sh 'terraform plan -out=tfplan'
-      }
-    }
-
-    stage('Terraform Apply') {
-      steps {
-        sh 'terraform apply tfplan'
-      }
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
     }
   }
+}
+
+# Configure the AWS Provider
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_instance" "web" {
+  ami           = "ami-053b0d53c279acc90"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "Himanshu"
+  }
+count = 3
 }
