@@ -1,23 +1,35 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
-    }
+pipeline {
+  agent any
+
+  environment {
+    AWS_ACCESS_KEY_ID = 'AKIA4ALQMRQXOR2JHVVO'
+    AWS_SECRET_ACCESS_KEY = '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'
+    AWS_DEFAULT_REGION = 'us-east-1'
   }
-}
 
-# Configure the AWS Provider
-provider "aws" {
-  region = "us-east-1"
-}
+  stages {
+    stage('git') {
+      steps {
+        git 'https://github.com/vrk2299/terr'
+      }
+    }
 
-resource "aws_instance" "web" {
-  ami           = "ami-022e1a32d3f742bd8"
+    stage('Terraform Init') {
+      steps {
+        sh 'terraform init'
+      }
+    }
 
-  instance_type = "t2.micro"
+    stage('Terraform Plan') {
+      steps {
+        sh 'terraform plan -out=tfplan'
+      }
+    }
 
-  tags = {
-    Name = "jaha"
+    stage('Terraform Apply') {
+      steps {
+        sh 'terraform apply tfplan'
+      }
+    }
   }
 }
